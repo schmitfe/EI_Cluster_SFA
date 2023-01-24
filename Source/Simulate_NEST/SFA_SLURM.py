@@ -2,13 +2,17 @@ import numpy as np
 import pickle
 import sys
 import time
+import os
 
 sys.path.append("..")
 from Defaults import defaultSimulate as default
 from Helper import ClusterModelNEST
-import psutil
+
 
 if __name__ == '__main__':
+    CPUcount = int(os.environ.get('SLURM_CPUS_PER_TASK', '1'))
+    JobID = os.environ.get('SLURM_JOB_ID', '0')
+
 
     FactorSize = 1
     FactorTime = 1
@@ -37,9 +41,6 @@ if __name__ == '__main__':
 
     print("FactorSize: " + str(FactorSize) + " FactorTime: " + str(FactorTime))
 
-    CPUcount=psutil.cpu_count(logical = False)
-    if CPUcount>8:
-        CPUcount-=2
 
     startTime = time.time()
     baseline = {'N_E': 80, 'N_I': 20,  # number of E/I neurons -> typical 4:1
