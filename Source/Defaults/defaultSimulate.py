@@ -23,7 +23,10 @@ gie = 1.
 # cluster number
 Q = 6
 # cluster weight ratios
-jplus = np.ones((2,2))
+jep = 3.875
+jip_ratio = 0.75
+jip = 1. + (jep - 1) * jip_ratio
+jplus = np.array([[jep, jip], [jip, jip]])
 
 # synaptic delay
 delay =0.1
@@ -33,7 +36,7 @@ s = 1.
 fixed_indegree = False
 # neuron parameters
 #neuron_type = 'gif_psc_exp'
-neuron_type = 'iaf_psc_exp'
+neuron_type = 'gif_psc_exp'
 
 E_L = 0.
 C_m = 1.
@@ -56,7 +59,7 @@ tau_syn_in = 2. #1. # 2.
 
 #Extra parameters
 lambda_0 = 1000. # intensity of point process at firing threshold V_T in 1/s
-Delta_V=0.00000000000000000000000000000000000000001  # sharpness of stochasiticity with lim -> 0 deterministic
+Delta_V=1e-41  # sharpness of stochasiticity with lim -> 0 deterministic
 g_L_E = C_m / tau_E
 g_L_I = C_m / tau_I
 # adaptation
@@ -65,8 +68,8 @@ q_sfa = [0.0] #[3.]# #[eps] #
 tau_sfa = [2.]#[eps]
 #spike triggered current
 
-Q_AdapI=0.0
-tau_stc = [179.0]#[eps]
+Q_AdapI=23.0
+tau_stc = [180.0]#[eps]
 q_stc = [Q_AdapI/tau_stc[0]] #[3.]# #[eps] #
 
 
