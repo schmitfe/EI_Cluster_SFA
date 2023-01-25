@@ -8,6 +8,68 @@ sys.path.append("..")
 from Defaults import defaultSimulate as default
 from Helper import ClusterModelNEST
 
+#generate stimulus protocol pseudo ranomly for each direction and condition
+def generateStimulusProtocol_Testing(Q, TrialsPerDirection, ITI, PreperatoryDuration, StimulusDuration, PrepIntensity, StimulusIntensity, Directions, Conditions):
+    #generate boolean array for stimulus protocol with shape 2*TrialPerDirection*length(Directions)*length(Conditions) x Q
+    #generate pseudorandom list of directions, conditions with TrialsPerDirection*length(Directions)*length(Conditions) elements
+    Protocol = []
+    for i in range(TrialsPerDirection):
+        for direction in Directions:
+            for condition in Conditions:
+                Protocol.append((direction, condition))
+    np.random.shuffle(Protocol)
+    #generate stimulus protocol
+    StimulusProtocol = np.zeros((2*TrialsPerDirection*len(Directions)*len(Conditions), Q), dtype=bool)
+    #use even row indexes for preperatory stimulus and odd row indexes for stimulus
+    for ii, (direction, condition) in enumerate(Protocol):
+        StimulusProtocol[2*ii+1, direction] = True
+        #condition 1: preperatory stimulus same as stimulus
+        for jj in range(direction//condition*condition, (direction//condition+1)*condition):
+            #modulo operator to get correct index for last condition
+            StimulusProtocol[2*ii, jj%Q] = True
+
+    #generate list of Q lists for StimTimes and StimAmplitudes
+    StimTimes = [[0.0] for i in range(Q)]
+    StimAmplitudes = [[0.0] for i in range(Q)]
+
+    #iterate through stimulus protocol and generate stimulus times and amplitudes
+    time=ITI
+    for ii in range(StimulusProtocol.shape[0]):
+        #get stimulus times and amplitudes
+        if ii%2 == 0:
+            #preperatory stimulus
+            #insert for each cluster which is marked as True in the stimulus protocol the stimulus amplitude of PrepIntensity
+            for jj in range(Q):
+                if StimulusProtocol[ii, jj]:
+                    StimAmplitudes[jj].append(PrepIntensity)
+                    StimTimes[jj].append(time)
+            time+=PreperatoryDuration
+        else:
+            #stimulus
+            # insert for each cluster which is marked as True in the stimulus protocol the stimulus amplitude of
+            # StimulusIntensity and if it was active during preperation but not during stimulus reset to 0
+            for jj in range(Q):
+                if StimulusProtocol[ii, jj]:
+                    StimAmplitudes[jj].append(StimulusIntensity)
+                    StimTimes[jj].append(time)
+                    # reset to 0 after stimulus
+                    StimAmplitudes[jj].append(0.0)
+                    StimTimes[jj].append(time+StimulusDuration)
+                elif StimulusProtocol[ii-1, jj]:
+                    StimAmplitudes[jj].append(0.0)
+                    StimTimes[jj].append(time)
+            time+=StimulusDuration+ITI
+    #convert to numpy arrays
+    for jj in range(Q):
+        StimTimes[jj] = np.array(StimTimes[jj])
+        StimAmplitudes[jj] = np.array(StimAmplitudes[jj])
+    return StimulusProtocol, StimTimes, StimAmplitudes
+
+
+
+
+    return StimulusProtocol
+
 
 if __name__ == '__main__':
     #get SLURM environment variables
