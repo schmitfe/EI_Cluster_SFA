@@ -287,6 +287,20 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
             nest.SetStatus(self.Currentsources[0],
                            {'amplitude_times': amplitude_times, 'amplitude_values': amplitude_values})
 
+        elif self.params['multi_stim_clusters'] is not None:
+            print('stimulating multi stim ...')
+            for stim_clusters, amplitudes, times in zip(self.params['multi_stim_clusters'],
+                                                        self.params['multi_stim_amps'],
+                                                        self.params['multi_stim_times']):
+                self.Currentsources.append(nest.Create('step_current_generator'))
+                nest.SetStatus(self.Currentsources[-1], {'amplitude_times': times[1:],
+                                                         'amplitude_values': amplitudes[1:]})
+                stim_units = []
+                for stim_cluster in stim_clusters:
+                    nest.Connect(self.Currentsources[-1],
+                                 self.Populations[0][stim_cluster])
+
+
     def create_recording_devices(self):
         """
         Creates a spike recorder connected to all neuron populations created by create_populations
@@ -359,6 +373,12 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
         self.setup_network()
         self.simulate()
         return self.get_recordings()
+
+    def clean_up(self):
+        """
+        Cleans up the NEST kernel.
+        """
+        nest.Cleanup()
 
 
 class ClusteredNetworkNEST_Timing(ClusteredNetworkNEST):
