@@ -89,7 +89,7 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
         I_neuron_params = {'E_L': self.params['E_L'], 'C_m': self.params['C_m'], 'tau_m': self.params['tau_I'],
                            't_ref': self.params['t_ref'], 'V_th': self.params['V_th_I'], 'V_reset': self.params['V_r'],
                            'I_e': I_xI}
-        if 'iaf_psc_exp' in self.params['neuron_type']:
+        if 'iaf_psc_exp' in self.params['neuron_type'] or 'gif_psc_exp' in self.params['neuron_type']:
             E_neuron_params['tau_syn_ex'] = self.params['tau_syn_ex']
             E_neuron_params['tau_syn_in'] = self.params['tau_syn_in']
             I_neuron_params['tau_syn_in'] = self.params['tau_syn_in']
@@ -105,8 +105,31 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
                     I_neuron_params['rho'] = self.params['rho']
             except KeyError:
                 pass
+            if 'gif_psc_exp' in self.params['neuron_type']:
+                #rename V_th to V_T_star
+                E_neuron_params['V_T_star'] = E_neuron_params.pop('V_th')
+                I_neuron_params['V_T_star'] = I_neuron_params.pop('V_th')
+                #use leak conductance g_L instead of time constant tau_m
+                E_neuron_params['g_L'] = E_neuron_params['C_m'] / E_neuron_params.pop('tau_m')
+                I_neuron_params['g_L'] = I_neuron_params['C_m'] / I_neuron_params.pop('tau_m')
+
+                E_neuron_params['lambda_0'] = self.params['lambda_0']
+                E_neuron_params['q_sfa'] = self.params['q_sfa']
+                E_neuron_params['tau_sfa'] = self.params['tau_sfa']
+                E_neuron_params['q_stc'] = [self.params['q_stc']]
+                E_neuron_params['tau_stc'] = [self.params['tau_stc']]
+                E_neuron_params['Delta_V'] = self.params['Delta_V']
+
+                I_neuron_params['lambda_0'] = self.params['lambda_0']
+                I_neuron_params['q_sfa'] = self.params['q_sfa']
+                I_neuron_params['tau_sfa'] = self.params['tau_sfa']
+                I_neuron_params['q_stc'] = [self.params['q_stc']]
+                I_neuron_params['tau_stc'] = [self.params['tau_stc']]
+                I_neuron_params['V_T_star'] = self.params['V_th_I']
+                I_neuron_params['Delta_V'] = self.params['Delta_V']
         else:
-            assert 'iaf_psc_exp' in self.params['neuron_type'], "iaf_psc_exp neuron model is the only implemented model"
+            # only iaf_psc_exp and gif_psc_exp are implemented
+            assert ['iaf_psc_exp', 'gif_psc_exp'] in self.params['neuron_type'], "only iaf_psc_exp and gif_psc_exp are implemented"
 
             # create the neuron populations
         E_pops = []
