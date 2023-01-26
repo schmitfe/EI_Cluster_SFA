@@ -60,8 +60,6 @@ tau_syn_in = 2. #1. # 2.
 #Extra parameters
 lambda_0 = 1000. # intensity of point process at firing threshold V_T in 1/s
 Delta_V=1e-41  # sharpness of stochasiticity with lim -> 0 deterministic
-g_L_E = C_m / tau_E
-g_L_I = C_m / tau_I
 # adaptation
 #adaptive TH
 q_sfa = [0.0] #[3.]# #[eps] #
@@ -69,8 +67,8 @@ tau_sfa = [2.]#[eps]
 #spike triggered current
 
 Q_AdapI=23.0
-tau_stc = [180.0]#[eps]
-q_stc = [Q_AdapI/tau_stc[0]] #[3.]# #[eps] #
+tau_stc = 180.0#[eps]
+q_stc = Q_AdapI/tau_stc #[3.]# #[eps] #
 
 
 
