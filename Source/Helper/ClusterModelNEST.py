@@ -293,7 +293,7 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
                                                         self.params['multi_stim_amps'],
                                                         self.params['multi_stim_times']):
                 self.Currentsources.append(nest.Create('step_current_generator'))
-                nest.SetStatus(self.Currentsources[-1], {'amplitude_times': times[1:],
+                nest.SetStatus(self.Currentsources[-1], {'amplitude_times': times[1:] + self.params['warmup'],
                                                          'amplitude_values': amplitudes[1:]})
                 stim_units = []
                 for stim_cluster in stim_clusters:
