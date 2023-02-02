@@ -81,7 +81,7 @@ def generateStimulusProtocol_Testing(Q, TrialsPerDirection, ITI, PreperatoryDura
 
 if __name__ == '__main__':
     #get SLURM environment variables
-    CPUcount = int(os.environ.get('SLURM_CPUS_PER_TASK', '14'))
+    CPUcount = int(os.environ.get('SLURM_CPUS_PER_TASK', '1'))
     JobID = os.environ.get('SLURM_JOB_ID', '0')
     ArrayID = os.environ.get('SLURM_ARRAY_TASK_ID', '0')
     #get git hash
