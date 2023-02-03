@@ -1,0 +1,10 @@
+#!/bin/bash -l
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=1024mb
+#SBATCH --time=00:05:00
+#SBATCH --account=fschmi69
+
+cd /home/fschmi69/git/EI_Cluster_SFA/Source/Simulate_NEST
+module load miniconda/py38_4.12.0
+conda activate /home/fschmi69/Software/NEST3_3
+python SFA_SLURM.py
