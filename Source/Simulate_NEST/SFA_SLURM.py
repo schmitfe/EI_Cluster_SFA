@@ -102,10 +102,10 @@ if __name__ == '__main__':
     output_path = os.environ.get('output_path', '../output/')
     #get enviroment variables for simulation protocol
     #Trials per direction, ITI, Preperatory duration, Stimulus duration, Stimulus intensity, Stimulus type
-    TrialsPerDirection = int(os.environ.get('TrialsPerDirection', '2'))
+    TrialsPerDirection = int(os.environ.get('TrialsPerDirection', '10'))
     ITI = float(os.environ.get('ITI', '500'))
     PreperatoryDuration = float(os.environ.get('PreperatoryDuration', '1000'))
-    StimulusDuration = float(os.environ.get('StimulusDuration', '300'))
+    StimulusDuration = float(os.environ.get('StimulusDuration', '500'))
     PrepIntensity = float(os.environ.get('PrepIntensity', '0.5'))
     StimulusIntensity = float(os.environ.get('StimulusIntensity', '0.5'))
 
