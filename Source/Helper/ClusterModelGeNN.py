@@ -21,7 +21,7 @@ class ClusteredNetworkGeNN(ClusterModelBase.ClusteredNetworkBase):
     to grab the spike data.
     """
 
-    def __init__(self, defaultValues, parameters, batch_size=1, NModel= "LIF"):
+    def __init__(self, defaultValues, parameters, batch_size=1, NModel= None):
         """
         Creates an object with functions to create neuron populations,
         stimulation devices and recording devices for an EI-clustered network.
@@ -74,6 +74,16 @@ class ClusteredNetworkGeNN(ClusterModelBase.ClusteredNetworkBase):
         assert self.params['N_E'] % self.params['Q'] == 0, 'N_E needs to be evenly divisible by Q'
         assert self.params['N_I'] % self.params['Q'] == 0, 'N_I needs to be evenly divisible by Q'
 
+        # neuron model
+        if 'iaf_psc_exp' in self.params['neuron_type']:
+            if self.NeuronModel is None:
+                self.NeuronModel = "LIF"
+        elif 'gif_psc_exp' in self.params['neuron_type']:
+            if self.NeuronModel is None:
+                self.NeuronModel = GeNN_Models.define_ReducedGIF()
+        else:
+            assert ('iaf_psc_exp' in self.params['neuron_type']) or ('gif_psc_exp' in self.params['neuron_type']), "iaf_psc_exp and gif_psc_exp neuron model are the only implemented model"
+
         # network parameters
 
         if self.params['I_th_E'] is None:
@@ -87,22 +97,38 @@ class ClusteredNetworkGeNN(ClusterModelBase.ClusteredNetworkBase):
         else:
             I_xI = self.params['I_th_I'] * (self.params['V_th_I'] - self.params['E_L']) / self.params['tau_I'] * \
                    self.params['C_m']
-        
-        if 'iaf_psc_exp' in self.params['neuron_type']:
-            pass
-        else:
-            assert 'iaf_psc_exp' in self.params['neuron_type'], "iaf_psc_exp neuron model is the only implemented model"
 
-        E_neuron_params = {'Vrest': self.params['E_L'] , 'C': self.params['C_m'], 'TauM': self.params['tau_E'], 'TauRefrac': self.params['t_ref'], 'Vthresh': self.params['V_th_E'], 'Vreset': self.params['V_r'],
-                           'Ioffset': I_xE}
-        E_neuron_init = {
-                         "RefracTime": -0.1
-                         }
-        I_neuron_params = {'Vrest': self.params['E_L'] , 'C': self.params['C_m'], 'TauM': self.params['tau_I'], 'TauRefrac': self.params['t_ref'], 'Vthresh': self.params['V_th_I'], 'Vreset': self.params['V_r'],
-                           'Ioffset': I_xI}
-        I_neuron_init = {
-            "RefracTime": -0.1
-        }
+        if 'iaf_psc_exp' in self.params['neuron_type']:
+            E_neuron_params = {'Vrest': self.params['E_L'] , 'C': self.params['C_m'], 'TauM': self.params['tau_E'], 'TauRefrac': self.params['t_ref'], 'Vthresh': self.params['V_th_E'], 'Vreset': self.params['V_r'],
+                               'Ioffset': I_xE}
+            E_neuron_init = {
+                             "RefracTime": -0.1
+                             }
+            I_neuron_params = {'Vrest': self.params['E_L'] , 'C': self.params['C_m'], 'TauM': self.params['tau_I'], 'TauRefrac': self.params['t_ref'], 'Vthresh': self.params['V_th_I'], 'Vreset': self.params['V_r'],
+                               'Ioffset': I_xI}
+            I_neuron_init = {
+                "RefracTime": -0.1
+            }
+        elif 'gif_psc_exp' in self.params['neuron_type']:
+            E_neuron_params = {'E_L': self.params['E_L'], 'C_m': self.params['C_m'], 'g_L': self.params['C_m'] / self.params['tau_E'],
+                               't_ref': self.params['t_ref'], 'V_T_star': self.params['V_th_E'],
+                               'V_reset': self.params['V_r'],
+                               'I_e': I_xE, 'q_stc': self.params['q_stc'], 'tau_stc': self.params['tau_stc'],
+                               'q_sfa': self.params['q_sfa'], 'tau_sfa': self.params['tau_sfa'],
+                               'lambda_0': self.params['lambda_0'], 'Delta_V': self.params['Delta_V'],}
+            E_neuron_init = {
+                "RefracTime": -0.1, "sfa": 0., "stc": 0., "TH": self.params['V_th_E'], "lambda": 0., "u": 0.,
+            }
+            I_neuron_params = {'E_L': self.params['E_L'], 'C_m': self.params['C_m'],
+                               'g_L': self.params['C_m'] / self.params['tau_I'],
+                               't_ref': self.params['t_ref'], 'V_T_star': self.params['V_th_I'],
+                               'V_reset': self.params['V_r'],
+                               'I_e': I_xE, 'q_stc': self.params['q_stc'], 'tau_stc': self.params['tau_stc'],
+                               'q_sfa': self.params['q_sfa'], 'tau_sfa': self.params['tau_sfa'],
+                               'lambda_0': self.params['lambda_0'], 'Delta_V': self.params['Delta_V'],}
+            I_neuron_init = {
+                "RefracTime": -0.1, "sfa": 0., "stc": 0., "TH": self.params['V_th_I'], "lambda": 0., "u": 0.,
+            }
 
         if self.params['V_m'] == 'rand':
             T_0_E = self.params['t_ref'] + ClusterHelper.FPT(self.params['tau_E'], self.params['E_L'], I_xE,
@@ -428,7 +454,7 @@ class ClusteredNetworkGeNN_Timing(ClusteredNetworkGeNN):
         Functions to save connectivity and create connectivity from file
     """
 
-    def __init__(self, defaultValues, parameters, batch_size=1, NModel= "LIF"):
+    def __init__(self, defaultValues, parameters, batch_size=1, NModel= None):
         """
         Creates an object with functions to create neuron populations,
         stimulation devices and recording devices for an EI-clustered network.
