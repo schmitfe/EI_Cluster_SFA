@@ -30,6 +30,15 @@ def plotExperiment (output_path, dpi=320, ax=None, labels=True):
 
 # main function to test the plot function
 if __name__ == '__main__':
+    #add path to search path for modules
+    import sys
+    sys.path.append('../Source')
+    import matplotlib.pyplot as plt
+    import pickle
+    import glob
 
-    ax = plotExperiment('../Simulate_NEST/Data.pkl')
-    plt.show()
+    #Get list of all output files
+    output_files = glob.glob('../output/*.pkl')
+
+
+
