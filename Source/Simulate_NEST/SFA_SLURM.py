@@ -47,7 +47,7 @@ def generateStimulusProtocol_Testing(Q, TrialsPerDirection, ITI, PreperatoryDura
                 if StimulusProtocol[ii, jj]:
                     StimAmplitudes[jj].append(PrepIntensity)
                     StimTimes[jj].append(time)
-            Marker[ii//2,0] = time
+            Marker[ii//2,0] = time      #Time of preperatory stimulus
             Marker[ii//2,1] = np.argwhere(StimulusProtocol[ii+1, :])[0][0]
             Marker[ii//2,2] = np.sum(StimulusProtocol[ii, :])
             time+=PreperatoryDuration

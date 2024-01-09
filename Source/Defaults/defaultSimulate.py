@@ -23,7 +23,7 @@ gie = 1.
 # cluster number
 Q = 6
 # cluster weight ratios
-jep = 3.875
+jep = 3.2
 jip_ratio = 0.75
 jip = 1. + (jep - 1) * jip_ratio
 jplus = np.array([[jep, jip], [jip, jip]])
@@ -43,8 +43,8 @@ C_m = 1.
 tau_E = 20.
 tau_I = 10.
 t_ref = 5.
-V_th_E = 20.
-V_th_I = 20.
+V_th_E = 15.
+V_th_I = 15.
 V_r = 0.
 I_xE = 1.
 I_xI = 2.
@@ -62,13 +62,13 @@ lambda_0 = 1000. # intensity of point process at firing threshold V_T in 1/s
 Delta_V=1e-41  # sharpness of stochasiticity with lim -> 0 deterministic
 # adaptation
 #adaptive TH
-q_sfa = [0.0] #[3.]# #[eps] #
-tau_sfa = [2.]#[eps]
+q_sfa = 0.0 #[3.]# #[eps] #
+tau_sfa = 2.#[eps]
 #spike triggered current
 
-Q_AdapI=23.0
+Q_adapt=23.0
 tau_stc = 180.0#[eps]
-q_stc = Q_AdapI/tau_stc #[3.]# #[eps] #
+q_stc = Q_adapt/tau_stc #[3.]# #[eps] #
 
 
 
@@ -97,6 +97,7 @@ n_jobs = 1
 
 # stimulation
 stim_clusters = None # clusters to be stimulated
+multi_stim_clusters = None # clusters to be stimulated (various ones)
 stim_amp = 0.  # amplitude of the stimulation current in pA
 stim_starts = []      # list of stimulation start times
 stim_ends = []          # list of stimulation end times

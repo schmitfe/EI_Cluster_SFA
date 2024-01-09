@@ -114,15 +114,15 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
                 I_neuron_params['g_L'] = I_neuron_params['C_m'] / I_neuron_params.pop('tau_m')
 
                 E_neuron_params['lambda_0'] = self.params['lambda_0']
-                E_neuron_params['q_sfa'] = self.params['q_sfa']
-                E_neuron_params['tau_sfa'] = self.params['tau_sfa']
+                E_neuron_params['q_sfa'] = [self.params['q_sfa']]
+                E_neuron_params['tau_sfa'] = [self.params['tau_sfa']]
                 E_neuron_params['q_stc'] = [self.params['q_stc']]
                 E_neuron_params['tau_stc'] = [self.params['tau_stc']]
                 E_neuron_params['Delta_V'] = self.params['Delta_V']
 
                 I_neuron_params['lambda_0'] = self.params['lambda_0']
-                I_neuron_params['q_sfa'] = self.params['q_sfa']
-                I_neuron_params['tau_sfa'] = self.params['tau_sfa']
+                I_neuron_params['q_sfa'] = [self.params['q_sfa']]
+                I_neuron_params['tau_sfa'] = [self.params['tau_sfa']]
                 I_neuron_params['q_stc'] = [self.params['q_stc']]
                 I_neuron_params['tau_stc'] = [self.params['tau_stc']]
                 I_neuron_params['V_T_star'] = self.params['V_th_I']

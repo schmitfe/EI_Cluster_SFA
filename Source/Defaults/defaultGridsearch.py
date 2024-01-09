@@ -61,13 +61,13 @@ g_L_E = C_m / tau_E
 g_L_I = C_m / tau_I
 # adaptation
 #adaptive TH
-q_sfa = [0.0] #[3.]# #[eps] #
-tau_sfa = [2.]#[eps]
+q_sfa = 0.0 #[3.]# #[eps] #
+tau_sfa = 2.#[eps]
 #spike triggered current
 
-Q_AdapI=0.0*230
-tau_stc = [179.0]#[eps]
-q_stc = [Q_AdapI/tau_stc[0]] #[3.]# #[eps] #
+Q_AdapI=230
+tau_stc = 179.0#[eps]
+q_stc = Q_AdapI/tau_stc #[3.]# #[eps] #
 
 
 n_jobs = 12
