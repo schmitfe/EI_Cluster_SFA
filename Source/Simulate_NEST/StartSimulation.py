@@ -26,9 +26,10 @@ variable_parameter_names = Parameters['VariableParameterNames']
 
 
 # create output folder if it does not exist
-output_folder = '../output'
+output_folder = '/scratch/fschmi69/spontaneousSFA/output'
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
+os.environ['output_path'] = '/scratch/fschmi69/spontaneousSFA/output/'
 
 # We want to run the simulations in parallel on the cluster with CPUcount subprocesses
 # Each subprocess should run one simulation and write the results to its own output file, after a simulation is done

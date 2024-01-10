@@ -4,7 +4,8 @@ import glob
 import sys
 import os
 import pandas as pd
-import spiketools
+sys.path.append("..")
+from Helper import spiketools
 
 def filterSpikes(spikesArg, time=None, ID_range=None, IDs=None):
     """
