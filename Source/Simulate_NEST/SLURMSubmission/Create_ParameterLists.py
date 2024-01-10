@@ -49,8 +49,24 @@ if __name__ == '__main__':
              'warmup': 1000.,  'randseed': 100}
     #create a dictionary with variable parameters
     N_steps = 6
-    variable_parameters = {'I_th_E': np.linspace(1.25, 3.0, N_steps), 'I_th_I': np.linspace(0.75, 2.0, N_steps),
-                            'tau_stc': np.linspace(10., 500., N_steps), 'Q_adapt': np.linspace(0.0, 50.0, N_steps),
-                            'Jep': np.linspace(1.0, 6.0, N_steps)}
+    Heterogeneous_Steps = True
+    Steps_Jep = 21
+    Steps_Q_adapt = 21
+    Steps_tau_stc = 21
+    Steps_I_th_E = 11
+    Steps_I_th_I = 11
 
-    CreateParameterLists(fixed_parameters, variable_parameters, N_Jobs=40, OutputPath='/scratch/fschmi69/spontaneousSFA/Parameters')
+    if ~Heterogeneous_Steps:
+        Steps_Jep = N_steps
+        Steps_Q_adapt = N_steps
+        Steps_tau_stc = N_steps
+        Steps_I_th_E = N_steps
+        Steps_I_th_I = N_steps
+
+
+
+    variable_parameters = {'I_th_E': np.linspace(1.25, 3.0, Steps_I_th_E), 'I_th_I': np.linspace(0.75, 2.0, Steps_I_th_I),
+                            'tau_stc': np.linspace(10., 500., Steps_tau_stc), 'Q_adapt': np.linspace(0.0, 50.0, Steps_Q_adapt),
+                            'Jep': np.linspace(1.0, 6.0, Steps_Jep)}
+
+    CreateParameterLists(fixed_parameters, variable_parameters, N_Jobs=4000, OutputPath='/scratch/fschmi69/spontaneousSFA/Parameters')
