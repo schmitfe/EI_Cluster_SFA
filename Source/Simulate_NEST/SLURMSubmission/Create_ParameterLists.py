@@ -56,7 +56,7 @@ if __name__ == '__main__':
     Steps_I_th_E = 11
     Steps_I_th_I = 11
 
-    if ~Heterogeneous_Steps:
+    if not Heterogeneous_Steps:
         Steps_Jep = N_steps
         Steps_Q_adapt = N_steps
         Steps_tau_stc = N_steps
