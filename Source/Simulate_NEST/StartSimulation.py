@@ -8,12 +8,16 @@ DEBUG = True
 # get SLURM environment variables
 JobID = os.environ.get('SLURM_JOB_ID', '0')
 ArrayID = os.environ.get('SLURM_ARRAY_TASK_ID', '0')
+Timeout_Simulation = os.environ.get('Timeout_Simulation', '180')
 
 # ArrayID is the ending of the filename of the input file
 # e.g. Parameters_0.pkl
 
+# use common path for input and output files
+CommonPath=os.environ.get('common_path', '/scratch/fschmi69/spontaneousSFA/')
+
 # get input file
-input_file = '/scratch/fschmi69/spontaneousSFA/Parameters/Parameters_' + ArrayID + '.pkl'
+input_file = CommonPath+'Parameters/Parameters_' + ArrayID + '.pkl'
 
 # open input file each tuple is one simulation
 with open(input_file, 'rb') as infile:
@@ -24,12 +28,17 @@ fixed_parameters = Parameters['FixedParameter']
 variable_parameters = Parameters['VariableParameterValues']
 variable_parameter_names = Parameters['VariableParameterNames']
 
+# create error log folder if it does not exist
+error_folder = CommonPath+'error'
+if not os.path.exists(error_folder):
+    os.makedirs(error_folder)
+os.environ['error_path'] = error_folder+'/'
 
 # create output folder if it does not exist
-output_folder = '/scratch/fschmi69/spontaneousSFA/output'
+output_folder = CommonPath+'output'
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
-os.environ['output_path'] = '/scratch/fschmi69/spontaneousSFA/output/'
+os.environ['output_path'] = output_folder+'/'
 
 # We want to run the simulations in parallel on the cluster with CPUcount subprocesses
 # Each subprocess should run one simulation and write the results to its own output file, after a simulation is done
@@ -50,7 +59,25 @@ for ii, VarParameter in enumerate(variable_parameters):
 
     # run subprocess, for debugging we want to see the output
    # if ~DEBUG:
-    subprocess.run(['python', 'SFA_Spontaneous_SLURM.py'])
+    try:
+        subprocess.run(['python', 'SFA_Spontaneous_SLURM.py'], timeout=int(Timeout_Simulation), check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        with open(os.environ['error_path'] + 'error_' + JobID + '_' + ArrayID + '.txt', 'a') as f:
+            f.write("CalledProcessError\n")
+            print("CalledProcessError")
+            f.write("returncode: "+str(e.returncode)+"\n")
+            f.write(e.stderr+"\n")
+            f.write(';'.join(variable_parameter_names)+"\n")
+            f.write(str(VarParameter))
+            f.write("\n\n")
+    except subprocess.TimeoutExpired as e:
+        with open(os.environ['error_path'] + 'error_' + JobID + '_' + ArrayID + '.txt', 'a') as f:
+            f.write("TimeoutExpired "+str(e.timeout)+"\n")
+            print("TimeoutExpired")
+            f.write(';'.join(variable_parameter_names)+"\n")
+            f.write(str(VarParameter))
+            f.write("\n\n")
+
     #else:
     #    p=subprocess.Popen(['python', 'SFA_Spontaneous_SLURM.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     # wait until subprocess is finished
