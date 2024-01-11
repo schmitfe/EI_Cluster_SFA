@@ -237,4 +237,6 @@ if __name__ == '__main__':
 
     with open(output_path, 'wb') as outfile:
         pickle.dump(Data, outfile)
-    #print("Time:  ", End-Start)
+
+    # return exit code 0 if everything went fine
+    sys.exit(0)
