@@ -159,6 +159,8 @@ if __name__ == '__main__':
     if len(Values_E) == 0:
         Values_E = MissingValues_E.T
         E_SpikeCounts = np.zeros(len(MissingValues_E))
+    elif len(MissingValues_E) == 0:
+        pass
     else:
         Values_E = np.concatenate((Values_E, MissingValues_E.T), axis=1)
         E_SpikeCounts = np.concatenate((E_SpikeCounts, np.zeros(len(MissingValues_E))), axis=0)
@@ -166,6 +168,8 @@ if __name__ == '__main__':
     if len(Values_I) == 0:
         Values_I = MissingValues_I.T
         I_SpikeCounts = np.zeros(len(MissingValues_I))
+    elif len(MissingValues_I) == 0:
+        pass
     else:
         Values_I = np.concatenate((Values_I, MissingValues_I.T), axis=1)
         I_SpikeCounts = np.concatenate((I_SpikeCounts, np.zeros(len(MissingValues_I))), axis=0)
