@@ -135,6 +135,13 @@ if __name__ == '__main__':
     I_Spikes = ExtractMeasurement.filterSpikes(Spikes, IDs=I_sample)
     # if there are no spikes, we can not estimate the Fano factor and CV2, so we return nan
 
+    if os.getenv('SHOW_Plot', 'False')=='True':
+        import matplotlib.pyplot as plt
+        plt.plot(Spikes[0], Spikes[1], '.', color='black', label='_nolegend_', markersize=0.5)
+        plt.xlim(5000, 6000)
+        plt.show()
+        plt.close()
+
 
     del Spikes
     # add 3rd row to spike trains with the trial number
