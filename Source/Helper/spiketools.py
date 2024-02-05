@@ -5,8 +5,8 @@ from bisect import bisect_right
 import sys
 sys.path.append("..")
 import numpy as np
-import pyximport; pyximport.install(setup_args={"include_dirs":np.get_include()},
-                  reload_support=True)
+#import pyximport; pyximport.install(setup_args={"include_dirs":np.get_include()},
+#                  reload_support=True)
 from  Helper.Cspiketools import time_resolved_cv_two as _time_resolved_cv_two
 import numpy as np
 def spiketimes_to_binary(spiketimes,tlim = None,dt = 1.):
