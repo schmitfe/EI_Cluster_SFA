@@ -175,12 +175,12 @@ if __name__=='__main__':
                                     experimentally_observed['E_FanoFactor'] + half_interval['E_FanoFactor']),
                    'CV2_E': (experimentally_observed['CV2_E'] - half_interval['CV2_E'],
                                     experimentally_observed['CV2_E'] + half_interval['CV2_E']),
-                   'tau_stc': (35.0, 270.0),
+                   'tau_stc': (35.0, 350.0),
                    }
 
 
-    Steps = 10
-    maxVal = 1.0
+    Steps = 20
+    maxVal = 2.0
     AdditionalVariable_parameters = {'PS_amplitude': np.linspace(maxVal/Steps, maxVal, Steps),
                                      #'RS_amplitude': np.linspace(0.0, 0.5, Steps),
                                      }
@@ -205,5 +205,5 @@ if __name__=='__main__':
     df = remove_other_columns(df)
 
     # create parameter lists
-    CreateParameterLists(df, AdditionalVariable_parameters, N_Jobs=300, OutputPath='/scratch/fschmi69/stimulationSFA/Parameters')
+    CreateParameterLists(df, AdditionalVariable_parameters, N_Jobs=1000, OutputPath='/scratch/fschmi69/stimulationSFA/Parameters')
 
