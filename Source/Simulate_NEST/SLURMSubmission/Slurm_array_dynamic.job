@@ -1,9 +1,9 @@
 #!/bin/bash -l
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=2024mb
-#SBATCH --time=4:00:00
+#SBATCH --time=6:00:00
 #SBATCH --account=fschmi69
-#SBATCH --array=0-299
+#SBATCH --array=0-999
 
 cd /home/fschmi69/git/EI_Cluster_SFA/Source/Simulate_NEST
 module load miniconda/py38_4.12.0
