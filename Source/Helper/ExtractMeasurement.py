@@ -26,18 +26,19 @@ def filterSpikes(spikesArg, time=None, ID_range=None, IDs=None):
         spikes = spikes[:,np.isin(spikes[1, :], IDs)]
     return spikes
 
-def CutTrials(spikes, trialStart, trialEnd):
+def CutTrials(spikes, trialStart, trialEnd, TriggerTime=0.0):
     """
     Cut spikes into trials
     :param spikes: numpy array with spikes (row 0 time, row 1 ID)
     :param trialTimes: numpy array with trial times (row 0 start time, row 1 end time)
     :return: numpy array with spikes (row 0 time, row 1 ID, row 2 trial number)
     """
+
     spikes = spikes.copy()
     trials = []
     for ii, (TS, TE) in enumerate(zip(trialStart, trialEnd)):
         FilteredSpikes = filterSpikes(spikes, time=(TS, TE))
-        FilteredSpikes[0, :] = FilteredSpikes[0, :] - TS
+        FilteredSpikes[0, :] = FilteredSpikes[0, :] - TS - TriggerTime
         # add trial number to spikes
         FilteredSpikes = addTrialNumber(FilteredSpikes, ii)
         trials.append(FilteredSpikes)
