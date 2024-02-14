@@ -7,8 +7,8 @@ DEBUG = True
 
 # get SLURM environment variables
 JobID = os.environ.get('SLURM_JOB_ID', '0')
-#ArrayID = os.environ.get('SLURM_ARRAY_TASK_ID', '400')
-ArrayID = str(np.random.randint(0, 59))
+ArrayID = os.environ.get('SLURM_ARRAY_TASK_ID', '0')
+#ArrayID = str(np.random.randint(0, 59))
 Timeout_Simulation = os.environ.get('Timeout_Simulation', '7200')
 
 print(ArrayID)
