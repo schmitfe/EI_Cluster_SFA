@@ -140,8 +140,9 @@ if __name__ == '__main__':
 
     #get enviroment variables for simulation parmaeters
     randseed = int(os.environ.get('randseed', str(np.random.randint(1000000))))   # set this to fixed value across nodes
-    # Jep, jip_ratio, I_th_E, I_th_I, N_E, tau_stc, q_stc
-    jep = float(os.environ.get('Jep', str(default.jep)))                # Tune this parameter
+    # jep, jip_ratio, I_th_E, I_th_I, N_E, tau_stc, q_stc
+    # we use small case for jep -> error in initial spontaneous search
+    jep = float(os.environ.get('jep', str(default.jep)))                # Tune this parameter
     jip_ratio = float(os.environ.get('jip_ratio', '0.75'))
     I_th_E = float(os.environ.get('I_th_E', str(default.I_th_E)))       # Tune this parameter
     I_th_I = float(os.environ.get('I_th_I', str(default.I_th_I)))       # Tune this parameter
