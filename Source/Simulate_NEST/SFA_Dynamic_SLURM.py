@@ -236,11 +236,14 @@ if __name__ == '__main__':
     params['multi_stim_times'] = StimTimes
     params['multi_stim_amps'] = StimAmplitudes
 
+    params['stim_clusters_delay'] = [200.0]
+
     params['simtime'] = np.max([np.max(x) for x in StimTimes])
 
     EI_Network = ClusterModelNEST.ClusteredNetworkNEST(default, params)
     EI_Network.setup_network()
     EI_Network.simulate()
+    EI_Network.clean_up()
 
     # Analyze data, we are interested in the average firing rate of the excitatory and inhibitory population,
     # the average Fano factor of excitatory and inhibitory population and the average CV2 of the excitatory and
@@ -440,7 +443,7 @@ if __name__ == '__main__':
     #    pickle.dump(EI_Network.get_parameter(), outfile)
     #    pickle.dump(StimulusDict, outfile)
     #    pickle.dump({'gitHash': gitHash, 'JobID': JobID, 'ArrayID': ArrayID}, outfile)
-    EI_Network.clean_up()
+
 
     FR_E_stim = np.nanmean(FR_E_stim, axis=0)
     FR_E_nonstim = np.nanmean(FR_E_nonstim, axis=0)

@@ -319,9 +319,18 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
                 nest.SetStatus(self.Currentsources[-1], {'amplitude_times': times[1:] + self.params['warmup'],
                                                          'amplitude_values': amplitudes[1:]})
                 stim_units = []
+                if 'stim_clusters_delay' in self.params:
+                    if len(self.params['stim_clusters_delay']) == 1:
+                        syn_dict = {"delay": nest.random.uniform(min=0.1, max=self.params['stim_clusters_delay'][0])}
+                    else:
+                        syn_dict = {"delay": nest.random.uniform(min=self.params['stim_clusters_delay'][0],
+                                                                 max=self.params['stim_clusters_delay'][1])}
+                else:
+                    syn_dict = {}
                 for stim_cluster in stim_clusters:
                     nest.Connect(self.Currentsources[-1],
-                                 self.Populations[0][stim_cluster])
+                                 self.Populations[0][stim_cluster],
+                                 syn_spec=syn_dict)
 
 
     def create_recording_devices(self):
