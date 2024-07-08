@@ -215,7 +215,8 @@ if __name__ == '__main__':
 
     params= {'n_jobs': CPUcount, 'N_E': N_E, 'N_I': N_I, 'dt': 0.1, 'neuron_type': 'gif_psc_exp',
              'Q': 6, 'jplus': np.array([[jep, jip], [jip, jip]]), 'I_th_E': I_th_E, 'I_th_I': I_th_I,
-             'warmup': 1000., 'jep': jep, 'jip_ratio': jip_ratio, 'tau_stc': tau_stc, 'Q_adapt': Q_adapt, 'q_stc': q_stc, 'randseed': randseed}
+             'warmup': 1000., 'jep': jep, 'jip_ratio': jip_ratio, 'tau_stc': tau_stc, 'Q_adapt': Q_adapt, 'q_stc': q_stc, 'randseed': randseed+1,
+             'fixed_indegree': True,  'only_E_SFA': True}
 
     # calculate simulation duration, start and end times of trials
     np.random.seed(int(ArrayID))
@@ -236,14 +237,13 @@ if __name__ == '__main__':
     params['multi_stim_times'] = StimTimes
     params['multi_stim_amps'] = StimAmplitudes
 
-    params['stim_clusters_delay'] = [200.0]
+    #params['stim_clusters_delay'] = [200.0]
 
     params['simtime'] = np.max([np.max(x) for x in StimTimes])
 
     EI_Network = ClusterModelNEST.ClusteredNetworkNEST(default, params)
     EI_Network.setup_network()
     EI_Network.simulate()
-    EI_Network.clean_up()
 
     # Analyze data, we are interested in the average firing rate of the excitatory and inhibitory population,
     # the average Fano factor of excitatory and inhibitory population and the average CV2 of the excitatory and
@@ -272,17 +272,26 @@ if __name__ == '__main__':
     if os.getenv('SHOW_Plot', 'False')=='True':
         import matplotlib.pyplot as plt
         # plot spikes in range 3000 to 8000 ms
-        index = np.logical_and(Spikes[0] > 3000, Spikes[0] < 8000)
+        index = np.logical_and(Spikes[0] > 2000, Spikes[0] < 10000)
         plt.figure()
         plt.plot(Spikes[0][index], Spikes[1][index], '.', color='black', label='_nolegend_', markersize=0.5)
         #plt.plot(Spikes[0], Spikes[1], '.', color='black', label='_nolegend_', markersize=0.5)
-        plt.xlim(3000, 8000)
+        plt.xlim(2000, 10000)
         plt.xlabel('Time (ms)')
-        index = np.logical_and(StimulusDict['Marker'][:, 0] > 3000, StimulusDict['Marker'][:, 0] < 8000)
+        plt.title("Cond.:"+str(Condition[0])+" PS:"+str(PS_amplitude))
+        index = np.logical_and(StimulusDict['Marker'][:, 0] > 2000, StimulusDict['Marker'][:, 0] < 10000)
         for Mark in StimulusDict['Marker'][index]:
             plt.axvline(Mark[0], color='g')
             #plt.axvline(Mark[0] + StimulusDict['PreperatoryDuration'], color='r')
             #plt.axvline(Mark[0] + StimulusDict['PreperatoryDuration'] + StimulusDict['StimulusDuration'], color='blue')
+        plt.show()
+        plt.close()
+
+        fig, ax = plt.subplots(6, 1, sharex=True)
+        for ii in range(6):
+            ax[ii].stairs(StimAmplitudes[5-ii][:-1], StimTimes[5-ii])
+        plt.xlim(2000, 10000)
+        plt.title("Cond.:" + str(Condition[0]) + " PS:" + str(PS_amplitude))
         plt.show()
         plt.close()
 
@@ -340,24 +349,28 @@ if __name__ == '__main__':
         Time_FR.append(time_FR_loc)
         for jj in np.unique(E_Spikes_stim[1]):
             E_spikes_stim_single = E_Spikes_stim[:, E_Spikes_stim[1] == jj]
+            if E_spikes_stim_single.shape[1]/(len(np.unique(E_spikes_stim_single[2]))*(maxWindow+window[1]-window[0])/1000) < 5:
+                print('Warning: Not enough spikes for Fano Factor estimation in unit ', jj)
+            else:
+                Fano_loc, time_Fano_loc = spiketools.kernel_fano(E_spikes_stim_single[[0,2]], window=400, tlim=[window[0]-maxWindow//2, window[1]+maxWindow//2], dt=1)
+                FanoFactor_E_stim.append(Fano_loc)
+                Time_Fano.append(time_Fano_loc)
 
-            Fano_loc, time_Fano_loc = spiketools.kernel_fano(E_spikes_stim_single[[0,2]], window=400, tlim=[window[0]-maxWindow//2, window[1]+maxWindow//2], dt=1)
-            FanoFactor_E_stim.append(Fano_loc)
-            Time_Fano.append(time_Fano_loc)
-
-            CV_two_loc, time_CV_two_loc = spiketools.time_resolved_cv_two(E_spikes_stim_single[[0,2]], window=400, tlim=[window[0]-maxWindow//2, window[1]+maxWindow//2])
-            CV2_E_stim.append(CV_two_loc)
-            Time_CV2.append(time_CV_two_loc)
+                CV_two_loc, time_CV_two_loc = spiketools.time_resolved_cv_two(E_spikes_stim_single[[0,2]], window=400, tlim=[window[0]-maxWindow//2, window[1]+maxWindow//2])
+                CV2_E_stim.append(CV_two_loc)
+                Time_CV2.append(time_CV_two_loc)
         for jj in np.unique(E_Spikes_nonstim[1]):
             E_spikes_nonstim_single = E_Spikes_nonstim[:, E_Spikes_nonstim[1] == jj]
+            if E_spikes_nonstim_single.shape[1]/(len(np.unique(E_spikes_stim_single[2]))*(maxWindow+window[1]-window[0])/1000) < 5:
+                print('Warning: Not enough spikes for Fano Factor estimation in unit ', jj)
+            else:
+                Fano_loc, time_Fano_loc = spiketools.kernel_fano(E_spikes_nonstim_single[[0,2]], window=400, tlim=[window[0]-maxWindow//2, window[1]+maxWindow//2], dt=1)
+                FanoFactor_E_nonstim.append(Fano_loc)
+                Time_Fano.append(time_Fano_loc)
 
-            Fano_loc, time_Fano_loc = spiketools.kernel_fano(E_spikes_nonstim_single[[0,2]], window=400, tlim=[window[0]-maxWindow//2, window[1]+maxWindow//2], dt=1)
-            FanoFactor_E_nonstim.append(Fano_loc)
-            Time_Fano.append(time_Fano_loc)
-
-            CV_two_loc, time_CV_two_loc = spiketools.time_resolved_cv_two(E_spikes_nonstim_single[[0,2]], window=400, tlim=[window[0]-maxWindow//2, window[1]+maxWindow//2])
-            CV2_E_nonstim.append(CV_two_loc)
-            Time_CV2.append(time_CV_two_loc)
+                CV_two_loc, time_CV_two_loc = spiketools.time_resolved_cv_two(E_spikes_nonstim_single[[0,2]], window=400, tlim=[window[0]-maxWindow//2, window[1]+maxWindow//2])
+                CV2_E_nonstim.append(CV_two_loc)
+                Time_CV2.append(time_CV_two_loc)
 
 
 

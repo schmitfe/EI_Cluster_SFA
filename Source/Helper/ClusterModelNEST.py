@@ -89,47 +89,89 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
         I_neuron_params = {'E_L': self.params['E_L'], 'C_m': self.params['C_m'], 'tau_m': self.params['tau_I'],
                            't_ref': self.params['t_ref'], 'V_th': self.params['V_th_I'], 'V_reset': self.params['V_r'],
                            'I_e': I_xI}
-        if 'iaf_psc_exp' in self.params['neuron_type'] or 'gif_psc_exp' in self.params['neuron_type']:
-            E_neuron_params['tau_syn_ex'] = self.params['tau_syn_ex']
-            E_neuron_params['tau_syn_in'] = self.params['tau_syn_in']
+
+        if 'only_E_SFA' in self.params.keys():
+            I_neuron_type = 'iaf_psc_exp'
             I_neuron_params['tau_syn_in'] = self.params['tau_syn_in']
             I_neuron_params['tau_syn_ex'] = self.params['tau_syn_ex']
-
-            # iaf_psc_exp allows stochasticity, if not used - ignore
             try:
                 if self.params['delta_'] is not None:
-                    E_neuron_params['delta'] = self.params['delta_']
                     I_neuron_params['delta'] = self.params['delta_']
                 if self.params['rho'] is not None:
-                    E_neuron_params['rho'] = self.params['rho']
                     I_neuron_params['rho'] = self.params['rho']
             except KeyError:
                 pass
-            if 'gif_psc_exp' in self.params['neuron_type']:
-                #rename V_th to V_T_star
-                E_neuron_params['V_T_star'] = E_neuron_params.pop('V_th')
-                I_neuron_params['V_T_star'] = I_neuron_params.pop('V_th')
-                #use leak conductance g_L instead of time constant tau_m
-                E_neuron_params['g_L'] = E_neuron_params['C_m'] / E_neuron_params.pop('tau_m')
-                I_neuron_params['g_L'] = I_neuron_params['C_m'] / I_neuron_params.pop('tau_m')
+            if 'iaf_psc_exp' in self.params['neuron_type'] or 'gif_psc_exp' in self.params['neuron_type']:
+                E_neuron_params['tau_syn_ex'] = self.params['tau_syn_ex']
+                E_neuron_params['tau_syn_in'] = self.params['tau_syn_in']
+                # iaf_psc_exp allows stochasticity, if not used - ignore
+                try:
+                    if self.params['delta_'] is not None:
+                        E_neuron_params['delta'] = self.params['delta_']
+                    if self.params['rho'] is not None:
+                        E_neuron_params['rho'] = self.params['rho']
+                except KeyError:
+                    pass
+                if 'gif_psc_exp' in self.params['neuron_type']:
+                    # rename V_th to V_T_star
+                    E_neuron_params['V_T_star'] = E_neuron_params.pop('V_th')
+                    # use leak conductance g_L instead of time constant tau_m
+                    E_neuron_params['g_L'] = E_neuron_params['C_m'] / E_neuron_params.pop('tau_m')
 
-                E_neuron_params['lambda_0'] = self.params['lambda_0']
-                E_neuron_params['q_sfa'] = [self.params['q_sfa']]
-                E_neuron_params['tau_sfa'] = [self.params['tau_sfa']]
-                E_neuron_params['q_stc'] = [self.params['q_stc']]
-                E_neuron_params['tau_stc'] = [self.params['tau_stc']]
-                E_neuron_params['Delta_V'] = self.params['Delta_V']
-
-                I_neuron_params['lambda_0'] = self.params['lambda_0']
-                I_neuron_params['q_sfa'] = [self.params['q_sfa']]
-                I_neuron_params['tau_sfa'] = [self.params['tau_sfa']]
-                I_neuron_params['q_stc'] = [self.params['q_stc']]
-                I_neuron_params['tau_stc'] = [self.params['tau_stc']]
-                I_neuron_params['V_T_star'] = self.params['V_th_I']
-                I_neuron_params['Delta_V'] = self.params['Delta_V']
+                    E_neuron_params['lambda_0'] = self.params['lambda_0']
+                    E_neuron_params['q_sfa'] = [self.params['q_sfa']]
+                    E_neuron_params['tau_sfa'] = [self.params['tau_sfa']]
+                    E_neuron_params['q_stc'] = [self.params['q_stc']]
+                    E_neuron_params['tau_stc'] = [self.params['tau_stc']]
+                    E_neuron_params['Delta_V'] = self.params['Delta_V']
+            else:
+                # only iaf_psc_exp and gif_psc_exp are implemented
+                assert ['iaf_psc_exp', 'gif_psc_exp'] in self.params[
+                    'neuron_type'], "only iaf_psc_exp and gif_psc_exp are implemented"
         else:
-            # only iaf_psc_exp and gif_psc_exp are implemented
-            assert ['iaf_psc_exp', 'gif_psc_exp'] in self.params['neuron_type'], "only iaf_psc_exp and gif_psc_exp are implemented"
+            I_neuron_type = self.params['neuron_type']
+
+            if 'iaf_psc_exp' in self.params['neuron_type'] or 'gif_psc_exp' in self.params['neuron_type']:
+                E_neuron_params['tau_syn_ex'] = self.params['tau_syn_ex']
+                E_neuron_params['tau_syn_in'] = self.params['tau_syn_in']
+                I_neuron_params['tau_syn_in'] = self.params['tau_syn_in']
+                I_neuron_params['tau_syn_ex'] = self.params['tau_syn_ex']
+
+                # iaf_psc_exp allows stochasticity, if not used - ignore
+                try:
+                    if self.params['delta_'] is not None:
+                        E_neuron_params['delta'] = self.params['delta_']
+                        I_neuron_params['delta'] = self.params['delta_']
+                    if self.params['rho'] is not None:
+                        E_neuron_params['rho'] = self.params['rho']
+                        I_neuron_params['rho'] = self.params['rho']
+                except KeyError:
+                    pass
+                if 'gif_psc_exp' in self.params['neuron_type']:
+                    #rename V_th to V_T_star
+                    E_neuron_params['V_T_star'] = E_neuron_params.pop('V_th')
+                    I_neuron_params['V_T_star'] = I_neuron_params.pop('V_th')
+                    #use leak conductance g_L instead of time constant tau_m
+                    E_neuron_params['g_L'] = E_neuron_params['C_m'] / E_neuron_params.pop('tau_m')
+                    I_neuron_params['g_L'] = I_neuron_params['C_m'] / I_neuron_params.pop('tau_m')
+
+                    E_neuron_params['lambda_0'] = self.params['lambda_0']
+                    E_neuron_params['q_sfa'] = [self.params['q_sfa']]
+                    E_neuron_params['tau_sfa'] = [self.params['tau_sfa']]
+                    E_neuron_params['q_stc'] = [self.params['q_stc']]
+                    E_neuron_params['tau_stc'] = [self.params['tau_stc']]
+                    E_neuron_params['Delta_V'] = self.params['Delta_V']
+
+                    I_neuron_params['lambda_0'] = self.params['lambda_0']
+                    I_neuron_params['q_sfa'] = [self.params['q_sfa']]
+                    I_neuron_params['tau_sfa'] = [self.params['tau_sfa']]
+                    I_neuron_params['q_stc'] = [self.params['q_stc']]
+                    I_neuron_params['tau_stc'] = [self.params['tau_stc']]
+                    I_neuron_params['V_T_star'] = self.params['V_th_I']
+                    I_neuron_params['Delta_V'] = self.params['Delta_V']
+            else:
+                # only iaf_psc_exp and gif_psc_exp are implemented
+                assert ['iaf_psc_exp', 'gif_psc_exp'] in self.params['neuron_type'], "only iaf_psc_exp and gif_psc_exp are implemented"
 
             # create the neuron populations
         E_pops = []
@@ -138,7 +180,7 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
             E_pops.append(nest.Create(self.params['neuron_type'], int(self.params['N_E'] / self.params['Q'])))
             nest.SetStatus(E_pops[-1], E_neuron_params)
         for q in range(self.params['Q']):
-            I_pops.append(nest.Create(self.params['neuron_type'], int(self.params['N_I'] / self.params['Q'])))
+            I_pops.append(nest.Create(I_neuron_type, int(self.params['N_I'] / self.params['Q'])))
             nest.SetStatus(I_pops[-1], I_neuron_params)
 
         if self.params['delta_I_xE'] > 0:
@@ -357,16 +399,12 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
         self.connect()
         self.create_recording_devices()
         self.create_stimulation()
-        nest.Prepare()
 
     def simulate(self):
         """
         Simulates network for a period of warmup+simtime
         """
-        if self.params['warmup'] + self.params['simtime'] <= 0.1:
-            pass
-        else:
-            nest.Run(self.params['warmup'] + self.params['simtime'])
+        nest.Simulate(self.params['warmup'] + self.params['simtime'])
 
     def get_recordings(self):
         """
@@ -405,12 +443,6 @@ class ClusteredNetworkNEST(ClusterModelBase.ClusteredNetworkBase):
         self.setup_network()
         self.simulate()
         return self.get_recordings()
-
-    def clean_up(self):
-        """
-        Cleans up the NEST kernel.
-        """
-        nest.Cleanup()
 
 
 class ClusteredNetworkNEST_Timing(ClusteredNetworkNEST):

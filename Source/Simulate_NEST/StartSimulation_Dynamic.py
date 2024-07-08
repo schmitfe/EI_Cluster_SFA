@@ -3,7 +3,8 @@ import os
 import numpy as np
 import pickle
 
-DEBUG = True
+DEBUG = False
+PLOT = False
 
 # get SLURM environment variables
 JobID = os.environ.get('SLURM_JOB_ID', '0')
@@ -49,6 +50,9 @@ output_folder = CommonPath+'output'
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 os.environ['output_path'] = output_folder+'/'
+
+if PLOT:
+    os.environ['SHOW_Plot'] = 'True'
 
 # We want to run the simulations in parallel on the cluster with CPUcount subprocesses
 # Each subprocess should run one simulation and write the results to its own output file, after a simulation is done
